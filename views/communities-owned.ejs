@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <% include ad-header %>
     <meta charset="utf-8">
     <title>LPC - Communities</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +20,6 @@
     <!-- To hide google translate header bar on each page -->
     <style type='text/css'> iframe.goog-te-banner-frame{ display: none !important;}</style>
     <style type='text/css'> body {position: static !important; top:0px !important;}</style>
-    <% include ad-header %>
 </head>
 
 <body>
@@ -95,7 +95,7 @@
                         </thead>
                         <tbody>
                                 <input id="link" type="text" value="" style="opacity: 0;">
-
+                            <% if (communities != undefined && communities != null) {%>
                             <% for(var i=0; i<communities.length; i++) {%>
                                     <tr>
                                         <td style="text-transform: capitalize;"><%=communities[i].community.name%></td>
@@ -103,6 +103,7 @@
                                         <td class="text-align-center"><button type="submit" name="communityID" value="<%= communities[i]._id %>" class="btn btn-md btn-primary hide-button-outline"><span class="iconify" data-icon="jam:write" style="color:#337ab7;" data-inline="false" data-width="25" data-height="25"></span></button>
                                         <td class="text-align-center"><a class="btn btn-md btn-danger" data-toggle="modal" href="#deleteCommunityModal" onclick="populateCommunityID('<%=communities[i]._id%>')">Delete</a></td>
                                     </tr>
+                            <%}%>
                             <%}%>
                         </tbody>
                     </table>
@@ -168,9 +169,9 @@
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap.min.js"></script>
-    <script src="/static/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js" defer></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/jquery.easing.min.js"></script>
     <script src="/static/js/wow.js"></script>
@@ -203,6 +204,7 @@ $(document).ready(function () {
     })
 
     $('#panic-button-check-sound').prop("checked", myUser.user.panicButtonSound)
+    $('#alert-volume-slider').val(myUser.user.alertVolumeLevel || 10)
 });
 
 function copyText(element, code) {
@@ -240,9 +242,24 @@ function fillAccountDetails() {
     socket.emit('update_panic_btn_sound', <%- JSON.stringify(user) %>)
     socket.on('load_panic_btn_result', (res) => {
       $('#panic-button-check-sound').prop("checked", !res.user.panicButtonSound)
-      $('#successfully-updated-alert').removeClass('hide').delay(2000).fadeOut(1000, function() {
-    $(this).hide();
+      $('#successfully-updated-alert').removeClass('hide').addClass('show').delay(2000).fadeOut(1000, function () {
+        $(this).addClass('hide').removeClass('show');
   });
+    })
+  }
+
+  function adjustAlertVolumeSlider() {
+    var socket=io();
+    var volumeAmount = $('#alert-volume-slider').val()
+    var myObj = {
+      dbUser: dbUser,
+      volume: volumeAmount
+    }
+    socket.emit('update_alert_volume_slider', myObj)
+    socket.on('load_alert_volume_result', (res) => {
+      $('#successfully-updated-alert').removeClass('hide').addClass('show').delay(2000).fadeOut(1000, function () {
+        $(this).addClass('hide').removeClass('show');
+      });
     })
   }
 </script>
