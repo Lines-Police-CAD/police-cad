@@ -1,0 +1,15 @@
+{
+    "PenalCodes": [
+      {
+        "SectionTitle": "",
+        "Data": [
+          {
+            "Violation": "",
+            "JailTime": "",
+            "Fine": "",
+            "Explanation": ""
+          }
+        ]
+    }
+]
+}
